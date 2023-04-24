@@ -8,6 +8,8 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -15,12 +17,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.net.URI;
 
 public class MainActivity extends AppCompatActivity {
-    Button videoCapture;
+    Button videoCapture, imageCapture;
 
     private  static final int CAMERA_REQUEST_CODE = 2;
 
@@ -28,7 +32,12 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "AKN";
 
+    private static final int IMAGE_CAPTURE_CODE = 200;
+
     private Uri videoPath;
+    private File imageFile;
+
+    private ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         videoCapture = findViewById(R.id.videoCapture);
+        imageCapture = findViewById(R.id.imageCapture);
+        imageView = findViewById(R.id.image);
 
         if(isCameraPresentInPhone()) {
             Log.i(TAG, "Camera Detected");
@@ -45,10 +56,22 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        imageCapture.setOnClickListener(cameraCaptureClicked);
         videoCapture.setOnClickListener(videoCaptureClicked);
 
     }
-
+    public View.OnClickListener cameraCaptureClicked = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            if(ContextCompat.checkSelfPermission(view.getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED){
+                Toast.makeText(view.getContext(), "Requires Camera Permission", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Toast.makeText(view.getContext(), "Camera Capturing Started", Toast.LENGTH_SHORT).show();
+            Log.i(TAG, "Camera Capture Started");
+            captureImage();
+        }
+    };
     public View.OnClickListener videoCaptureClicked = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -79,6 +102,26 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(TAG, "Error Occurred");
             }
         }
+
+        if(requestCode == IMAGE_CAPTURE_CODE) {
+            if(resultCode == RESULT_OK) {
+                try{
+
+                    //Log.i(TAG, "Video Is Recorded and available at path: "+ imagePath);
+                    imageFile = createFile();
+                    Bitmap b = (Bitmap) data.getExtras().get("data");
+                    imageView.setImageBitmap(b);
+                }catch (Exception e){
+                    Log.i(TAG, e.getMessage());
+                    return;
+                }
+
+            }else if(resultCode == RESULT_CANCELED) {
+                Log.i(TAG, "Video Recording Cancelled");
+            }else{
+                Log.i(TAG, "Error Occurred");
+            }
+        }
     }
 
     private boolean isCameraPresentInPhone() {
@@ -91,8 +134,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void recordVideo() {
+    private void recordVideo() {
         Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
         startActivityForResult(intent, VIDEO_CAPTURE_CODE);
+    }
+
+    private void captureImage() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, IMAGE_CAPTURE_CODE);
     }
 }
