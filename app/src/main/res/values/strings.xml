@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Potato-Disease</string>
+    <string name="camera_not_found">Camera Not Detected</string>
 </resources>
