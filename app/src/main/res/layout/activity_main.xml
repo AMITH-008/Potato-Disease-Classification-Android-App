@@ -11,7 +11,7 @@
         android:layout_height="256dp"
         android:id="@+id/image"
         android:layout_marginBottom="30dp"
-        android:layout_centerInParent="true"
+        android:layout_centerHorizontal="true"
         android:src= "@drawable/blank" />
 
     <Button
@@ -29,6 +29,24 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Capture Image"
+        android:layout_centerInParent="true" />
+
+    <Button
+        android:id="@+id/imageSelect"
+        android:layout_below="@id/imageCapture"
+        android:layout_marginTop="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Image"
+        android:layout_centerInParent="true" />
+
+    <Button
+        android:id="@+id/imageUpload"
+        android:layout_below="@id/imageSelect"
+        android:layout_marginTop="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Upload Image"
         android:layout_centerInParent="true" />
 
 </RelativeLayout>
